@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.Pattern;
 
 import com.gestion.empleados.entidades.Empleado;
 import com.lowagie.text.Document;
@@ -40,6 +41,9 @@ public class EmpleadoExporterPDF {
 		Font fuente = FontFactory.getFont(FontFactory.HELVETICA);
 		fuente.setColor(Color.WHITE);
 		fuente.setSize(8);
+
+
+
 
 		celda.setPhrase(new Phrase("ID", fuente));
 		tabla.addCell(celda);
@@ -77,7 +81,13 @@ public class EmpleadoExporterPDF {
 		Font fuente = FontFactory.getFont(FontFactory.HELVETICA);
 		fuente.setColor(Color.BLACK);
 		fuente.setSize(8);
+
+
+
+
+
 		for (Empleado empleado : listaEmpleados) {
+
 			celda.setPhrase(new Phrase(String.valueOf(empleado.getId()), fuente));
 			tabla.addCell(celda);
 			celda.setPhrase(new Phrase(String.valueOf(empleado.getNombre()), fuente));

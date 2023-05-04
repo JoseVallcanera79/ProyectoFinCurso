@@ -44,7 +44,7 @@
 							<td th:text="${empleado.apellido}"></td>
 							<td th:text="${empleado.email}"></td>
 							<td th:text="${empleado.direccion}"></td>
-							<td th:text="${empleado.fecha}"  width="150px"></td>
+							<td th:text="${#dates.format(empleado.fecha, 'dd-MM-yyyy')}"  width="150px"></td>
 							<td th:text="${empleado.telefono}"></td>
 							<td th:text="${empleado.genero}"></td>
 							<td th:text="${empleado.salario}"></td>
