@@ -16,7 +16,33 @@ public class EmpleadoServiceImpl implements EmpleadoService {
 
 	@Autowired
 	private EmpleadoRepository empleadoRepository;
-	
+
+
+		/*public void registerEmpleado(Empleado empleado) {
+			String email = empleado.getEmail();
+			if (empleadoRepository.findByEmail(email) != null) {
+				// El correo electrónico ya está registrado
+				// Puedes lanzar una excepción, mostrar un mensaje de error, etc.
+			} else {
+				// Guardar el usuario en la base de datos
+				empleadoRepository.save(empleado);
+			}
+		}*/
+	@Override
+	@Transactional
+	public void save(Empleado empleado) throws EmailAlreadyExistsException {
+		String email = empleado.getEmail();
+		if (empleadoRepository.findByEmail(email) != null) {
+			// El correo electrónico ya está registrado
+			// Puedes lanzar una excepción, mostrar un mensaje de error, etc.
+			throw new EmailAlreadyExistsException("El email ya existe en la base de datos");
+		} else {
+			// Guardar el usuario en la base de datos
+			empleadoRepository.save(empleado);
+		}
+	}
+
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<Empleado> findAll() {
@@ -29,11 +55,7 @@ public class EmpleadoServiceImpl implements EmpleadoService {
 		return empleadoRepository.findAll(pageable);
 	}
 
-	@Override
-	@Transactional
-	public void save(Empleado empleado) {
-		empleadoRepository.save(empleado);
-	}
+
 
 	@Override
 	@Transactional

@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import com.gestion.empleados.servicio.EmailAlreadyExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,10 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -36,7 +34,13 @@ public class EmpleadoController {
 
 	@Autowired
 	private EmpleadoService empleadoService;
-	
+
+	@ExceptionHandler(EmailAlreadyExistsException.class)
+	public String handleEmailAlreadyExistsException(EmailAlreadyExistsException e, RedirectAttributes flash) {
+		flash.addFlashAttribute("error", e.getMessage());
+		return "redirect:/form";
+	}
+
 	@GetMapping("/ver/{id}")
 	public String verDetallesDelEmpleado(@PathVariable(value = "id") Long id,Map<String,Object> modelo,RedirectAttributes flash) {
 		Empleado empleado = empleadoService.findOne(id);
@@ -71,8 +75,8 @@ public class EmpleadoController {
 		return "form";
 	}
 	
-	@PostMapping("/form")
-	public String guardarEmpleado(@Valid Empleado empleado,BindingResult result,Model modelo,RedirectAttributes flash,SessionStatus status) {
+	/*@PostMapping("/form")
+	public String guardarEmpleado(@Valid Empleado empleado,BindingResult result,Model modelo,RedirectAttributes flash,SessionStatus status) throws EmailAlreadyExistsException {
 		if(result.hasErrors()) {
 			modelo.addAttribute("titulo", "Registro de cliente");
 			return "form";
@@ -84,8 +88,28 @@ public class EmpleadoController {
 		status.setComplete();
 		flash.addFlashAttribute("success", mensaje);
 		return "redirect:/listar";
+	}*/
+	@PostMapping("/form")
+	public String guardarEmpleado(@Valid Empleado empleado, BindingResult result, Model modelo, RedirectAttributes flash, SessionStatus status) {
+		if (result.hasErrors()) {
+			modelo.addAttribute("titulo", "Registro de cliente");
+			return "form";
+		}
+
+		try {
+			String mensaje = (empleado.getId() != null) ? "El empleado ha sido editado con éxito" : "Empleado registrado con éxito";
+			empleadoService.save(empleado);
+			status.setComplete();
+			flash.addFlashAttribute("success", mensaje);
+			return "redirect:/listar";
+		} catch (EmailAlreadyExistsException e) {
+			result.rejectValue("email", "error.email", e.getMessage());
+			modelo.addAttribute("titulo", "Registro de cliente");
+			return "form";
+		}
 	}
-	
+
+
 	@GetMapping("/form/{id}")
 	public String editarEmpleado(@PathVariable(value = "id") Long id,Map<String, Object> modelo,RedirectAttributes flash) {
 		Empleado empleado = null;

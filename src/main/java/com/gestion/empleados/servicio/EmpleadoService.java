@@ -13,7 +13,7 @@ public interface EmpleadoService {
 
 	public Page<Empleado> findAll(Pageable pageable);
 
-	public void save(Empleado empleado);
+	public void save(Empleado empleado) throws EmailAlreadyExistsException;
 
 	public Empleado findOne(Long id);
 
